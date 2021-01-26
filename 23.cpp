@@ -16,41 +16,59 @@ struct ListNode
 
 class Solution {
 public:
-    bool chklist(vector<ListNode*>& lists){
-        for (auto & p : lists){
-            if(p)
-                return true;
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        ListNode* head1 = l1;
+        ListNode* head2 = l2;
+        ListNode temp_node;
+        ListNode* temp_ptr = &temp_node;
+        while(head1 && head2)
+        {
+            if(head1->val < head2->val)
+            {
+                temp_ptr->next = head1;
+                head1 = head1->next;
+            }
+            else
+            {
+                temp_ptr->next = head2;
+                head2 = head2->next;
+            }
+            temp_ptr = temp_ptr->next;
         }
-        return false;
+        if(head1 == NULL)
+        {
+            temp_ptr->next = head2;
+        }
+        else
+        {
+            temp_ptr->next = head1;
+        }
+        return temp_node.next;
     }
 
     ListNode* mergeKLists(vector<ListNode*>& lists) {
-        ListNode ret(0);
-        ListNode *nxt = &ret;
+        if(lists.size() == 0)
+            return nullptr;
+        if(lists.size() == 1)
+            return lists[0];
 
-        int tmpmin;
-        int tmpindex;
-        while (chklist(lists))
+        int midindex = lists.size() / 2;
+
+        vector<ListNode *> Lgrp;
+        vector<ListNode *> Rgrp;
+
+        for (size_t i = 0; i < lists.size(); i++)
         {
-            tmpmin = __INT_MAX__;
-            for (int i = 0; i < lists.size(); i++)
-            {
-                if (lists[i])
-                {
-                    if (lists[i]->val < tmpmin)
-                    {
-                        tmpmin = lists[i]->val;
-                        tmpindex = i;
-                    }
-                }
-            }
-
-            nxt->next = lists[tmpindex];
-            lists[tmpindex] = lists[tmpindex]->next;
-            nxt = nxt->next;
+            if(i < midindex)
+                Lgrp.push_back(lists[i]);
+            else
+                Rgrp.push_back(lists[i]);
         }
 
-        return ret.next;
+        ListNode *Llist = mergeKLists(Lgrp);
+        ListNode *Rlist = mergeKLists(Rgrp);
+
+        return merge2Lists(Llist, Rlist);
     }
 };
 
