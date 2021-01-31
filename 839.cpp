@@ -6,77 +6,54 @@
 #include <algorithm>
 #include <math.h>
 using namespace std;
-int k = 0;
 class Solution {
     public:
-	bool cmpstr(string &sta, string &stb)
+	vector<int> f;
+
+	int find(int x)
 	{
-        if((sta == "coswmccgkc"))
-		    k = 1;
+		return f[x] == x ? x : f[x] = find(f[x]);
+	}
 
-
-		char error_chr[2][2];
-
-		int error_cnt = 0;
-
-		for (size_t i = 0; i < sta.size(); i++) {
-			if (sta[i] != stb[i]) {
-				if (error_cnt < 2) {
-					error_chr[0][error_cnt] = sta[i];
-					error_chr[1][error_cnt] = stb[i];
-					error_cnt++;
-
-					if (error_cnt == 2) {
-						if ((error_chr[0][1] != error_chr[1][0]) || (error_chr[0][0] != error_chr[1][1]))
-							return false;
-					}
-				} else {
+	bool check(const string &a, const string &b, int n)
+	{
+		int num = 0;
+		for (int i = 0; i < n; i++) {
+			if (a[i] != b[i]) {
+				num++;
+				if (num > 2)
 					return false;
-				}
 			}
 		}
-		return true;
+		return num <= 2;
 	}
-
-	bool insert_str(vector<vector<string> > &tmp, string &instr)
-	{
-		for (vector<string> &grp : tmp) {
-			for (string &str : grp) {
-				if (true == cmpstr(str, instr)) {
-					grp.push_back(instr);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	int test = 0;
 
 	int numSimilarGroups(vector<string> &strs)
 	{
-		vector<vector<string> > tmp;
-
-		for (string &tmpstr : strs) {
-
-            if(tmpstr == "cosgmccwkc"){
-		        test = 1;
-            }
-
-			if (false == insert_str(tmp, tmpstr)) {
-				vector<string> vstmp;
-				vstmp.emplace_back(tmpstr);
-				tmp.emplace_back(vstmp);
+		int n = strs.size();
+		int m = strs[0].length();
+		f.resize(n);
+		for (int i = 0; i < n; i++) {
+			f[i] = i;
+		}
+		for (int i = 0; i < n - 1; i++) {
+			for (int j = i + 1; j < n; j++) {
+				int fi = find(i), fj = find(j);
+				if (fi == fj) {
+					continue;
+				}
+				if (check(strs[i], strs[j], m)) {
+					f[fi] = fj;
+				}
 			}
 		}
-
-		for (auto &vec : tmp) {
-			for (auto &st : vec) {
-				cout << st << ",";
+		int ret = 0;
+		for (int i = 0; i < n; i++) {
+			if (f[i] == i) {
+				ret++;
 			}
-			cout << endl;
 		}
-
-		return tmp.size();
+		return ret;
 	}
 };
 
@@ -87,7 +64,7 @@ int main(int argc, char **argv)
 	Solution s;
 	auto ret = s.numSimilarGroups(str);
 
-	//printf("%d\n", ret);
+	printf("%d\n", ret);
 }
 
 
