@@ -5,9 +5,9 @@
             "label": "cppbuild",
             "command": "/usr/bin/g++",
             "args": [
-                "-g",
-                "-std=c++11",
-                "794.cpp",
+                "-g3",
+                "-std=c++14",
+                "630.cpp",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
