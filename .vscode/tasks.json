@@ -7,7 +7,7 @@
             "args": [
                 "-g3",
                 "-std=c++14",
-                "1610.cpp",
+                "1518.cpp",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
