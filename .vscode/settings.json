@@ -3,6 +3,7 @@
         "unordered_set": "cpp",
         "string": "cpp",
         "cstring": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "unordered_map": "cpp"
     }
 }
