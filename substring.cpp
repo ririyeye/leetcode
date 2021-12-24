@@ -11,69 +11,65 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <string.h>
 
 using namespace std;
 
 class Solution {
     public:
 	struct nod {
-		nod(string &&instr, size_t innum)
-			: str(instr), num(innum)
-		{
-		}
-		nod(const nod &innod)
-			: str(innod.str), num(innod.num), height(innod.height)
+		nod(size_t innum)
+			: num(innum)
 		{
 		}
 
-		string str;
 		int num;
 		int height;
 	};
 
 	string longestDupSubstring(string s)
 	{
-		vector<unique_ptr<nod> > sa;
+		vector<nod> sa;
 
 		int len = s.size();
 		for (size_t i = 0; i < len; i++) {
-			sa.emplace_back(make_unique<nod>(s.substr(i, len - i), i));
+			sa.emplace_back(i);
 		}
 
-		auto cmpstr = [](unique_ptr<nod> &A, unique_ptr<nod> &B) {
-			return A->str < B->str;
+		auto cmpstr = [&](nod &A, nod &B) {
+			return strcmp(&s[A.num], &s[B.num]) < 0 ? 1 : 0;
 		};
+
 		sort(sa.begin(), sa.end(), cmpstr);
 
 		vector<int> rank(len);
 
-		for(int i = 0 ; i < len ;i++) {
-			rank[sa[i]->num] = i;
+		for (int i = 0; i < len; i++) {
+			rank[sa[i].num] = i;
 		}
 
-		int min_hi = 0 ;
+		int min_hi = 0;
 
 		for (int i = 0; i < len; i++) {
-
 			int sa_index = rank[i];
 
-			if(sa_index - 1 < 0) {
-				sa[sa_index]->height = 0;
+			if (sa_index - 1 < 0) {
+				sa[sa_index].height = 0;
 				continue;
 			}
 
-			min_hi -= 1;
+			min_hi = min_hi - 1 < 0 ? 0 : min_hi - 1;
 
 			int init_pos = (min_hi - 1) < 0 ? 0 : (min_hi - 1);
 
-			for (int pos = init_pos; pos < sa[sa_index]->str.size() && pos < sa[sa_index - 1]->str.size(); pos++) {
-				if (sa[sa_index - 1]->str[pos] == sa[sa_index]->str[pos]) {
+			for (int pos = init_pos; pos < (len - sa[sa_index].num) && pos < (len - sa[sa_index - 1].num); pos++) {
+				if (s[sa[sa_index - 1].num + pos] == s[sa[sa_index].num + pos]) {
 					min_hi = pos + 1;
 				} else {
 					break;
 				}
 			}
-			sa[sa_index]->height = min_hi;
+			sa[sa_index].height = min_hi;
 		}
 
 		return "";
@@ -82,7 +78,7 @@ class Solution {
 
 int main(int argc, char **argv)
 {
-	string b = "aabaaaab";
+	string b = "abcd";
 	Solution s;
 	auto ret = s.longestDupSubstring(b);
 	return 0;
