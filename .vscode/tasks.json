@@ -7,7 +7,7 @@
             "args": [
                 "-g3",
                 "-std=c++14",
-                "1705.cpp",
+                "substring.cpp",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
