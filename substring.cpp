@@ -14,71 +14,100 @@
 #include <string.h>
 
 using namespace std;
+struct cmps {
+	vector<int> sa;
+	vector<int> rnk;
+	vector<int> tmp;
+	vector<int> height;
+	void getsa(int n, char *str)
+	{
+		sa.resize(n + 1);
+		rnk.resize(n + 1);
+		tmp.resize(n + 1);
 
+		int k;
+		auto cmp = [&](int i, int j) {
+			if (rnk[i] != rnk[j])
+				return rnk[i] < rnk[j];
+			int ri = (i + k <= n ? rnk[i + k] : -1);
+			int rj = (j + k <= n ? rnk[j + k] : -1);
+			return ri < rj;
+		};
+
+		for (int i = 1; i <= n; i++)
+			sa[i] = i, rnk[i] = str[i - 1];
+		for (k = 1; k <= n; k *= 2) {
+			sort(&sa[1], &sa[1 + n], cmp);
+			tmp[sa[1]] = 1;
+			for (int i = 2; i <= n; i++)
+				tmp[sa[i]] = tmp[sa[i - 1]] + cmp(sa[i - 1], sa[i]);
+			for (int i = 1; i <= n; i++)
+				rnk[i] = tmp[i];
+		}
+	}
+
+	void getheight(int n, char *str)
+	{
+		height.resize(n + 1);
+
+		for (int i = 1; i <= n; i++)
+			rnk[sa[i]] = i;
+		int h = 0;
+		height[1] = 0;
+		for (int i = 1; i <= n; i++) {
+			int j = sa[rnk[i] - 1];
+			
+			if (h > 0)
+				h--;
+			for (; j + h <= n && i + h <= n; h++){
+				int la = j + h -1;
+				int lb = i + h -1;
+				if(la < 0)
+					break;
+
+				if (str[la] != str[lb])
+					break;
+			}
+
+			height[rnk[i]] = h;
+		}
+	}
+};
+cmps cm;
 class Solution {
     public:
-	struct nod {
-		nod(size_t innum)
-			: num(innum)
-		{
-		}
-
-		int num;
-		int height;
-	};
 
 	string longestDupSubstring(string s)
 	{
-		vector<nod> sa;
-
 		int len = s.size();
-		for (size_t i = 0; i < len; i++) {
-			sa.emplace_back(i);
-		}
 
-		auto cmpstr = [&](nod &A, nod &B) {
-			return strcmp(&s[A.num], &s[B.num]) < 0 ? 1 : 0;
-		};
+		cm.getsa(len, &s[0]);
+		cm.getheight(len, &s[0]);
+#if 1
 
-		sort(sa.begin(), sa.end(), cmpstr);
 
-		vector<int> rank(len);
+		int max_height = 0;
+		int max_index = 0;
 
-		for (int i = 0; i < len; i++) {
-			rank[sa[i].num] = i;
-		}
-
-		int min_hi = 0;
-
-		for (int i = 0; i < len; i++) {
-			int sa_index = rank[i];
-
-			if (sa_index - 1 < 0) {
-				sa[sa_index].height = 0;
-				continue;
+		for (size_t i = 1; i <= len; i++) {
+			if (cm.height[i] > max_height) {
+				max_height = cm.height[i];
+				max_index = cm.sa[i] - 1;
 			}
-
-			min_hi = min_hi - 1 < 0 ? 0 : min_hi - 1;
-
-			int init_pos = (min_hi - 1) < 0 ? 0 : (min_hi - 1);
-
-			for (int pos = init_pos; pos < (len - sa[sa_index].num) && pos < (len - sa[sa_index - 1].num); pos++) {
-				if (s[sa[sa_index - 1].num + pos] == s[sa[sa_index].num + pos]) {
-					min_hi = pos + 1;
-				} else {
-					break;
-				}
-			}
-			sa[sa_index].height = min_hi;
 		}
 
-		return "";
+		if (max_height > 0) {
+			return s.substr(max_index, max_height);
+		} else {
+			return "";
+		}
+#endif
 	}
 };
 
 int main(int argc, char **argv)
 {
-	string b = "abcd";
+	string b = "nnpxouomcofdjuujloanjimymadkuepightrfodmauhrsy";
 	Solution s;
 	auto ret = s.longestDupSubstring(b);
 	return 0;
